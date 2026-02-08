@@ -9,98 +9,41 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
 </head>
 <body>
-
     <nav>
         <div class="logo">Linfei Wang</div>
         <ul class="nav-links">
             <li><a href="#about">关于我</a></li>
             <li><a href="#education">教育背景</a></li>
             <li><a href="#interests">兴趣爱好</a></li>
-            <li><a href="#contact">联系方式</a></li>
+            <li><a href="#ai-chat">AI分身</a></li>
         </ul>
     </nav>
 
     <header id="about" class="hero">
         <div class="hero-content">
-            <div class="profile-img">
-                <i class="fas fa-user-graduate"></i>
-            </div>
-            <h1>王琳霏 (Linfei Wang)</h1>
-            <p class="subtitle">英语专业研究生 | 探索语言与技术的边界</p>
+            <div class="profile-img"><i class="fas fa-user-graduate"></i></div>
+            <h1>王琳霏</h1>
+            <p class="subtitle">石河子大学英语专业研究生 | 学科教学研究</p>
             <div class="info-grid">
-                <span><i class="fas fa-venus"></i> 26岁</span>
-                <span><i class="fas fa-map-marker-alt"></i> 河南 · 南阳</span>
+                <span><i class="fas fa-map-marker-alt"></i> 河南南阳</span>
                 <span><i class="fas fa-envelope"></i> neurallinker@qq.com</span>
             </div>
         </div>
     </header>
 
-    <section id="education" class="container">
-        <h2><i class="fas fa-graduation-cap"></i> 教育背景</h2>
-        <div class="timeline">
-            <div class="timeline-item">
-                <div class="date">2022 - 至今</div>
-                <div class="content">
-                    <h3>石河子大学</h3>
-                    <p>硕士研究生 | 英语专业</p>
-                    <p>研究方向：学科教学（英语）</p>
-                </div>
-            </div>
-            <div class="timeline-item">
-                <div class="date">本科阶段</div>
-                <div class="content">
-                    <h3>周口师范学院</h3>
-                    <p>学士 | 英语专业</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="interests" class="container">
-        <h2><i class="fas fa-heart"></i> 兴趣与研究</h2>
-        <div class="interests-grid">
-            <div class="card">
-                <i class="fas fa-book-open"></i>
-                <h3>阅读</h3>
-                <p>沉浸于英语文学作品，钻研教育学经典书籍。</p>
-            </div>
-            <div class="card">
-                <i class="fas fa-plane"></i>
-                <h3>旅行</h3>
-                <p>探索不同的文化风貌，在行走中感悟世界。</p>
-            </div>
-            <div class="card">
-                <i class="fas fa-music"></i>
-                <h3>音乐</h3>
-                <p>流行与古典的爱好者，享受旋律带来的灵感。</p>
-            </div>
-            <div class="card">
-                <i class="fas fa-robot"></i>
-                <h3>前沿科技</h3>
-                <p>关注人工智能在教育领域的应用，探索AI赋能教学。</p>
-            </div>
-        </div>
-    </section>
-
     <section id="ai-chat" class="container">
         <h2><i class="fas fa-comments"></i> 与琳霏的AI分身聊天</h2>
-        <p class="chat-intro">你好！我是基于讯飞星火大模型训练的“数字琳霏”。你可以问我关于英语学习、学科教学或者琳霏个人经历的问题。</p>
-        
         <div class="chat-box">
             <div id="chat-history" class="chat-history">
-                <div class="message ai-message">你好呀！我是王琳霏的AI助手，很高兴见到你。</div>
+                <div class="message ai-message">你好！我是王琳霏的AI分身，很高兴见到你。</div>
             </div>
             <div class="input-area">
                 <input type="text" id="user-input" placeholder="输入你想问的问题...">
                 <button onclick="sendMessage()" id="send-btn">发送</button>
             </div>
-            <div id="status-text" style="font-size: 12px; color: #888; margin-top: 5px;"></div>
+            <div id="status-text" style="font-size: 12px; color: #888; margin-top: 5px; padding: 0 15px;"></div>
         </div>
     </section>
-
-    <footer id="contact">
-        <p>Copyright © 2026 Wang Linfei. All Rights Reserved.</p>
-    </footer>
 
     <script src="script.js"></script>
 </body>
