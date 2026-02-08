@@ -72,4 +72,58 @@ async function sendMessage() {
             const { done, value } = await reader.read();
             if (done) break;
 
-            const chunk = decoder.decode(value, { stream: true
+            const chunk = decoder.decode(value, { stream: true });
+            // 处理包含多个 data: 行的情况
+            const lines = chunk.split('\n');
+            
+            for (let line of lines) {
+                if (line.startsWith('data:')) {
+                    const dataStr = line.replace('data:', '').trim();
+                    if (dataStr === '[DONE]') break;
+
+                    try {
+                        const json = JSON.parse(dataStr);
+                        const content = json.choices[0].delta.content || "";
+                        if (content) {
+                            appendAiResponse(content);
+                        }
+                    } catch (e) {
+                        console.log("解析 JSON 出错", e);
+                    }
+                }
+            }
+        }
+
+        statusText.innerText = '对话结束';
+
+    } catch (error) {
+        console.error("请求失败:", error);
+        statusText.innerText = '连接失败: ' + error.message;
+    } finally {
+        sendBtn.disabled = false;
+    }
+}
+
+// --- 4. 辅助函数 ---
+function addMessage(text, role) {
+    const div = document.createElement('div');
+    div.className = `message ${role}-message`;
+    div.innerText = text;
+    chatHistory.appendChild(div);
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+}
+
+function appendAiResponse(text) {
+    if (!currentAiMsgDiv) {
+        currentAiMsgDiv = document.createElement('div');
+        currentAiMsgDiv.className = 'message ai-message';
+        chatHistory.appendChild(currentAiMsgDiv);
+    }
+    currentAiMsgDiv.innerText += text;
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+}
+
+// 绑定回车键
+userInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') sendMessage();
+});
