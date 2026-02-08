@@ -15,14 +15,20 @@ const statusText = document.querySelector('#status-text');
 
 function getAuthUrl() {
     const host = "spark-api.xf-yun.com";
-    const path = "/v3.5/chat"; // 确保路径正确
-    const date = new Date().toGMTString();
+    const path = "/v3.5/chat";
+    // 强制使用格林威治标准时间，确保格式严格符合讯飞要求
+    const date = new Date().toUTCString(); 
+    
     const signatureOrigin = `host: ${host}\ndate: ${date}\nGET ${path} HTTP/1.1`;
     const signatureSha = CryptoJS.HmacSHA256(signatureOrigin, API_SECRET);
     const signature = CryptoJS.enc.Base64.stringify(signatureSha);
+    
+    // 注意：这里的 algorithm 必须是小写 hmac-sha256
     const authorizationOrigin = `api_key="${API_KEY}", algorithm="hmac-sha256", headers="host date request-line", signature="${signature}"`;
     const authorization = btoa(authorizationOrigin);
-    return `wss://${host}${path}?authorization=${authorization}&date=${date}&host=${host}`;
+    
+    // 对 date 进行 URI 编码，防止特殊字符干扰
+    return `wss://${host}${path}?authorization=${authorization}&date=${encodeURIComponent(date)}&host=${host}`;
 }
 
 // 核心发送函数
