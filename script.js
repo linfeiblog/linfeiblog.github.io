@@ -16,19 +16,32 @@ const statusText = document.querySelector('#status-text');
 function getAuthUrl() {
     const host = "spark-api.xf-yun.com";
     const path = "/v3.5/chat";
-    // 强制使用格林威治标准时间，确保格式严格符合讯飞要求
-    const date = new Date().toUTCString(); 
     
+    // 1. 获取当前 UTC 时间并严格格式化
+    // 必须是这种格式: Sat, 07 Feb 2026 15:45:00 GMT (根据当前实际时间)
+    const date = new Date().toUTCString();
+    
+    console.log("当前使用的 UTC 时间:", date); // 你可以在控制台检查这个时间是否和标准 UTC 一致
+
+    // 2. 构造签名字符串
+    // 注意：GET 后面有一个空格，HTTP 前面有一个空格，不要多也不要少
     const signatureOrigin = `host: ${host}\ndate: ${date}\nGET ${path} HTTP/1.1`;
+    
+    // 3. HMAC-SHA256 加密
     const signatureSha = CryptoJS.HmacSHA256(signatureOrigin, API_SECRET);
     const signature = CryptoJS.enc.Base64.stringify(signatureSha);
     
-    // 注意：这里的 algorithm 必须是小写 hmac-sha256
+    // 4. 构造 Authorization
+    // 严格注意引号和逗号后的空格
     const authorizationOrigin = `api_key="${API_KEY}", algorithm="hmac-sha256", headers="host date request-line", signature="${signature}"`;
     const authorization = btoa(authorizationOrigin);
     
-    // 对 date 进行 URI 编码，防止特殊字符干扰
-    return `wss://${host}${path}?authorization=${authorization}&date=${encodeURIComponent(date)}&host=${host}`;
+    // 5. 组合成最终 URL
+    // 对 date 进行 encodeURIComponent 处理是关键，因为时间字符串里有空格和逗号
+    const finalUrl = `wss://${host}${path}?authorization=${authorization}&date=${encodeURIComponent(date)}&host=${host}`;
+    
+    console.log("最终生成的 WebSocket URL:", finalUrl);
+    return finalUrl;
 }
 
 // 核心发送函数
