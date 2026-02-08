@@ -1,54 +1,60 @@
 /**
- * 王琳霏个人网页 AI 功能 - WebSocket 稳定版
- * 模型版本：Spark Max (x1)
+ * 王琳霏个人网页 AI 分身 - 最终修复版 (WebSocket)
  */
 
 const APPID = '49e5008b';
 const API_SECRET = 'ODY4OGNkYTE4MGIwOTQ5NTBlZDhjN2hV';
 const API_KEY = '071fdbf0afa2b20f7445bc0f1bde9e3f';
 
-const SYSTEM_PROMPT = "你现在是王琳霏的数字分身。你是一名26岁的女生，石河子大学英语专业研二在读，籍贯河南南阳。你知性、热情，擅长学科教学研究。";
+const SYSTEM_PROMPT = "你现在是王琳霏的数字分身。你是一名26岁的女生，石河子大学英语专业研二在读。";
 
 const chatHistory = document.querySelector('#chat-history');
 const userInput = document.querySelector('#user-input');
 const sendBtn = document.querySelector('#send-btn');
 const statusText = document.querySelector('#status-text');
 
-let socket = null;
-let currentAiMsgDiv = null;
-
-// 生成 WebSocket 鉴权 URL
 function getAuthUrl() {
     const host = "spark-api.xf-yun.com";
+    const path = "/v3.5/chat"; // 确保路径正确
     const date = new Date().toGMTString();
-    const algorithm = "hmac-sha256";
-    const headers = "host date request-line";
-    const signatureOrigin = `host: ${host}\ndate: ${date}\nGET /v3.5/chat HTTP/1.1`;
+    const signatureOrigin = `host: ${host}\ndate: ${date}\nGET ${path} HTTP/1.1`;
     const signatureSha = CryptoJS.HmacSHA256(signatureOrigin, API_SECRET);
     const signature = CryptoJS.enc.Base64.stringify(signatureSha);
-    const authorizationOrigin = `api_key="${API_KEY}", algorithm="${algorithm}", headers="${headers}", signature="${signature}"`;
+    const authorizationOrigin = `api_key="${API_KEY}", algorithm="hmac-sha256", headers="host date request-line", signature="${signature}"`;
     const authorization = btoa(authorizationOrigin);
-    return `wss://${host}/v3.5/chat?authorization=${authorization}&date=${date}&host=${host}`;
+    return `wss://${host}${path}?authorization=${authorization}&date=${date}&host=${host}`;
 }
 
+// 核心发送函数
 function sendMessage() {
     const text = userInput.value.trim();
-    if (!text || sendBtn.disabled) return;
+    if (!text) return;
 
-    addMessage(text, 'user');
+    // UI 显示用户消息
+    const userDiv = document.createElement('div');
+    userDiv.className = 'message user-message';
+    userDiv.innerText = text;
+    chatHistory.appendChild(userDiv);
+    
     userInput.value = '';
     sendBtn.disabled = true;
-    statusText.innerText = '思考中...';
-    currentAiMsgDiv = null;
+    statusText.innerText = '正在通过加密通道连接...';
+
+    // 创建新的 AI 消息框
+    const aiDiv = document.createElement('div');
+    aiDiv.className = 'message ai-message';
+    chatHistory.appendChild(aiDiv);
+    chatHistory.scrollTop = chatHistory.scrollHeight;
 
     const url = getAuthUrl();
-    socket = new WebSocket(url);
+    const socket = new WebSocket(url);
 
     socket.onopen = () => {
+        statusText.innerText = '连接成功，琳霏正在思考...';
         const params = {
             "header": { "app_id": APPID },
             "parameter": {
-                "chat": { "domain": "generalv3.5", "temperature": 0.5, "max_tokens": 1024 }
+                "chat": { "domain": "generalv3.5", "temperature": 0.5 }
             },
             "payload": {
                 "message": {
@@ -65,43 +71,28 @@ function sendMessage() {
     socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
         if (data.header.code !== 0) {
-            statusText.innerText = "错误: " + data.header.message;
+            statusText.innerText = "出错了: " + data.header.message;
             socket.close();
             return;
         }
-
+        
         const content = data.payload.choices.text[0].content;
-        appendAiResponse(content);
+        aiDiv.innerText += content; // 流式追加文本
+        chatHistory.scrollTop = chatHistory.scrollHeight;
 
         if (data.payload.choices.status === 2) {
-            statusText.innerText = '对话完成';
+            statusText.innerText = '回复完成';
             sendBtn.disabled = false;
             socket.close();
         }
     };
 
-    socket.onerror = () => {
-        statusText.innerText = "连接失败，请检查网络或密钥。";
+    socket.onerror = (err) => {
+        console.error(err);
+        statusText.innerText = "连接失败，请确保 API 权限已开通且时间同步。";
         sendBtn.disabled = false;
     };
 }
 
-function addMessage(text, role) {
-    const div = document.createElement('div');
-    div.className = `message ${role}-message`;
-    div.innerText = text;
-    chatHistory.appendChild(div);
-    chatHistory.scrollTop = chatHistory.scrollHeight;
-}
-
-function appendAiResponse(text) {
-    if (!currentAiMsgDiv) {
-        currentAiMsgDiv = document.createElement('div');
-        currentAiMsgDiv.className = 'message ai-message';
-        chatHistory.appendChild(currentAiMsgDiv);
-    }
-    currentAiMsgDiv.innerText += text;
-    chatHistory.scrollTop = chatHistory.scrollHeight;
-}
-
+// 绑定回车
 userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
