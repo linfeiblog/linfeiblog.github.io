@@ -8,8 +8,8 @@
 // --- 1. 配置你的讯飞星火 API 信息 ---
 // 请在这里填入你的真实信息
 const APPID = '49e5008b'; 
-const API_SECRET = 'ODY4OGNkYTE4MGIwOTQ5NTBlZDhjN2hV'; 
-const API_KEY = '071fdbf0afa2b20f7445bc0f1bde9e3f';
+const API_SECRET = 'ODY4OGNkYTE4MGIwOTQ5NTBlZDhjN2Vh'; 
+const API_KEY = '071fdbf0afa2b20f7445bc0f1bde9ef3';
 
 // 你的 AI 分身人设设定
 const SYSTEM_PROMPT = "你现在是王琳霏的数字分身。你是一名26岁的女生，本科毕业于周口师范学院英语专业，现在是石河子大学英语专业的研二研究生，籍贯河南南阳。你的研究方向是学科教学。你的兴趣包括阅读英语文学、教育书籍、旅行、听流行和古典音乐，以及研究人工智能技术。请用热情、知性、友好的语气与人交流。";
